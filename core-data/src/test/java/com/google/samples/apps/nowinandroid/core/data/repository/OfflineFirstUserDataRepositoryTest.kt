@@ -68,7 +68,8 @@ class OfflineFirstUserDataRepositoryTest {
             )
 
             assertEquals(
-                niaPreferencesDataSource.followedTopicIds
+                niaPreferencesDataSource.userDataStream
+                    .map { it.followedTopics }
                     .first(),
                 subject.userDataStream
                     .map { it.followedTopics }
@@ -89,10 +90,42 @@ class OfflineFirstUserDataRepositoryTest {
             )
 
             assertEquals(
-                niaPreferencesDataSource.followedTopicIds
+                niaPreferencesDataSource.userDataStream
+                    .map { it.followedTopics }
                     .first(),
                 subject.userDataStream
                     .map { it.followedTopics }
+                    .first()
+            )
+        }
+
+    @Test
+    fun offlineFirstTopicsRepository_bookmark_news_resource_logic_delegates_to_nia_preferences() =
+        runTest {
+            subject.updateNewsResourceBookmark(newsResourceId = "0", bookmarked = true)
+
+            assertEquals(
+                setOf("0"),
+                subject.userDataStream
+                    .map { it.bookmarkedNewsResources }
+                    .first()
+            )
+
+            subject.updateNewsResourceBookmark(newsResourceId = "1", bookmarked = true)
+
+            assertEquals(
+                setOf("0", "1"),
+                subject.userDataStream
+                    .map { it.bookmarkedNewsResources }
+                    .first()
+            )
+
+            assertEquals(
+                niaPreferencesDataSource.userDataStream
+                    .map { it.bookmarkedNewsResources }
+                    .first(),
+                subject.userDataStream
+                    .map { it.bookmarkedNewsResources }
                     .first()
             )
         }
